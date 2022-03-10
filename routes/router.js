@@ -3,6 +3,8 @@ const router = require('express').Router();
 // const dbModel = include('databaseAccessLayer');
 //const dbModel = include('staticData');
 const userModel = include('models/web_user');
+const petModel = include('models/pet');
+const pet_typedModel = include('models/pet_type');
 const crypto = require('crypto');
 const { v4: uuid } = require('uuid');
 const passwordPepper = "SeCretPeppa4MySal+";
@@ -21,6 +23,29 @@ router.get('/', async (req, res) => {
 		else {
 			console.log(users);
 			res.render('index', { allUsers: users });
+		}
+	}
+	catch (ex) {
+		res.render('error', { message: 'Error connecting to MySQL' });
+		console.log("Error connecting to MySQL");
+		console.log(ex);
+	}
+});
+
+router.get('/pets', async (req, res) => {
+	console.log("page hit");
+	try {
+		const pets = await petModel.findAll({
+			attributes:
+				['pet_id', 'web_user_id', 'name', 'pet_type_id']
+		}); //{where: {web_user_id:1}}
+		if (pets === null) {
+			res.render('error', { message: 'Error connecting toMySQL' });
+			console.log("Error connecting to userModel");
+		}
+		else {
+			console.log(pets);
+			res.render('pets', { allPets: pets });
 		}
 	}
 	catch (ex) {
